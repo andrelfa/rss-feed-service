@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const app = express();
 const port = 3000;
 const cors = require("cors");
-const utils = require("./utils");
+import * as utils from "../utils";
 
 const allowedOrigins = ["http://localhost:3001"];
 
@@ -45,7 +45,7 @@ const rssFeeds = [
 ];
 
 app.get("/rss-feed", (req, res) => {
-  Promise.all(rssFeeds)
+  Promise.allSettled(rssFeeds)
     .then((feeds) => utils.prepareFeedCards(feeds))
     .then((data) => res.send(data))
     .catch((error) => console.log("Promise all throwed an error: ", error));

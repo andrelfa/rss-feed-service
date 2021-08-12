@@ -1,23 +1,22 @@
-const axiosInstance = require("./axiosInstance");
-// const axios = require('axios')
-const convert = require("xml-js");
-const dateFns = require("date-fns");
+import axiosInstance from "./axiosInstance";
+import { Feed, FeedItemType } from "./types/FeedItem";
+import convert, { ElementCompact } from "xml-js";
+import dateFns from "date-fns";
 
 const proxyUrl = "https://sheltered-reef-69308.herokuapp.com";
 
-// const axiosInstance = axios.create({
-//   headers: {'X-Requested-With': 'XMLHttpRequest'}
-// })
-
-function convertXmlToJson(data) {
-  return convert.xml2js(data, { compact: true, spaces: 4 });
+export function convertXmlToJson(data: any): Element | ElementCompact {
+  return convert.xml2js(data, { compact: true });
 }
 
-function handleDifferentRSSTypes(data) {
+export function handleDifferentRSSTypes(data: any): string {
   return data.rss ? data.rss.channel.item : data.feed.entry;
 }
 
-function handleFeedPromiseWithFeedName(feedUrl, feedName) {
+export function handleFeedPromiseWithFeedName(
+  feedUrl: string,
+  feedName: string
+): Promise<void | Feed> {
   return axiosInstance
     .get(`${proxyUrl}/${feedUrl}`)
     .then((data) => ({
@@ -27,17 +26,17 @@ function handleFeedPromiseWithFeedName(feedUrl, feedName) {
     .catch((err) => console.log({ err }));
 }
 
-function returnFirstKeyFromObject(textFieldObject) {
+export function returnFirstKeyFromObject(textFieldObject: any): any {
   if (!textFieldObject) return;
   return Object.keys(textFieldObject).map((key) => textFieldObject[key])[0];
 }
 
-function formatDate(date) {
+function formatDate(date: string): string {
   if (!date) return;
   return dateFns.format(new Date(date), "dd/MM/yyyy");
 }
 
-function prepareFeedCards(feedArray) {
+export function prepareFeedCards(feedArray: Feed[]): FeedItemType[] {
   return feedArray
     .map(({ data, feedName }) =>
       data.map((feedItem) => {
@@ -68,10 +67,3 @@ function prepareFeedCards(feedArray) {
       return 0;
     });
 }
-
-module.exports = {
-  convertXmlToJson,
-  handleDifferentRSSTypes,
-  handleFeedPromiseWithFeedName,
-  prepareFeedCards,
-};
